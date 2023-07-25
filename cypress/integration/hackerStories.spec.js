@@ -147,16 +147,16 @@ describe('Hacker Stories', () => {
       it('shows a max of 5 buttons for the last searched terms', () => {
         const faker = require('faker')
 
-        cy.intercept(
+        cy.intercept( // função de intercepção para request **/search**
           'GET',
           '**/search**'
-        ).agit statuss('getRandomStories')
+        ).as('getRandomStories')  // alias da função
 
         Cypress._.times(6, () => {
           cy.get('#search')
             .clear()
             .type(`${faker.random.word()}{enter}`)
-          cy.wait('@getRandomStories')
+          cy.wait('@getRandomStories')  // função que espera a request ALIAS finalizar
         })
 
         cy.get('.last-searches button')
