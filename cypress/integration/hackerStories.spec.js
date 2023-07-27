@@ -53,11 +53,6 @@ describe('Hacker Stories', () => {
       cy.get('.item').should('have.length', 19)
     })
 
-    // Since the API is external,
-    // I can't control what it will provide to the frontend,
-    // and so, how can I test ordering?
-    // This is why these tests are being skipped.
-    // TODO: Find a way to test them out.
     context.skip('Order by', () => {
       it('orders by title', () => { })
 
@@ -66,15 +61,6 @@ describe('Hacker Stories', () => {
       it('orders by comments', () => { })
 
       it('orders by points', () => { })
-    })
-
-    // Hrm, how would I simulate such errors?
-    // Since I still don't know, the tests are being skipped.
-    // TODO: Find a way to test them out.
-    context.skip('Errors', () => {
-      it('shows "Something went wrong ..." in case of a server error', () => { })
-
-      it('shows "Something went wrong ..." in case of a network error', () => { })
     })
   })
 
@@ -163,5 +149,35 @@ describe('Hacker Stories', () => {
           .should('have.length', 5)
       })
     })
+  })
+})
+
+context('Errors', () => {
+  it('shows "Something went wrong ..." in case of a server error', () => {
+    cy.intercept(
+      'GET',
+      '**/search**',
+      { statusCode: 500 } // forçando uma falha no SERVER como 500
+    ).as('getServerFailure')
+
+    cy.visit('/')
+    cy.wait('@getServerFailure')
+
+    cy.get('p:contains(Something went wrong ...)')
+      .should('be.visible')
+  })
+
+  it('shows "Something went wrong ..." in case of a network error', () => {
+    cy.intercept(
+      'GET',
+      '**/search**',
+      { forceNetworkError: true }  // forçando uma falha na REDE
+    ).as('getNetworkFaulire')
+
+    cy.visit('/')
+    cy.wait('@getNetworkFaulire')
+
+    cy.get('p:contains(Something went wrong ...)')
+      .should('be.visible')
   })
 })
